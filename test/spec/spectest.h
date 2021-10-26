@@ -47,8 +47,12 @@ public:
   std::vector<std::string> enumerate() const;
   std::tuple<std::string_view, WasmEdge::Configure, std::string>
   resolve(std::string_view Params) const;
-  bool compare(const std::vector<std::pair<std::string, std::string>> &Expected,
-               const std::vector<ValVariant> &Got) const;
+  bool compare(const std::pair<std::string, std::string> &Expected,
+               const ValVariant &Got, const ValType &GotT) const;
+  bool
+  compares(const std::vector<std::pair<std::string, std::string>> &Expected,
+           const std::vector<ValVariant> &Got,
+           const std::vector<ValType> &GotT) const;
   bool stringContains(const std::string &Expected,
                       const std::string &Got) const;
 
@@ -67,13 +71,14 @@ public:
   using InstantiateCallback = Expect<void>(const std::string &Filename);
   std::function<InstantiateCallback> onInstantiate;
 
-  using InvokeCallback = Expect<std::vector<ValVariant>>(
-      const std::string &ModName, const std::string &Field,
-      const std::vector<ValVariant> &Params,
-      const std::vector<ValType> &ParamTypes);
+  using InvokeCallback =
+      Expect<std::pair<std::vector<ValVariant>, std::vector<ValType>>>(
+          const std::string &ModName, const std::string &Field,
+          const std::vector<ValVariant> &Params,
+          const std::vector<ValType> &ParamTypes);
   std::function<InvokeCallback> onInvoke;
 
-  using GetCallback = Expect<std::vector<ValVariant>>(
+  using GetCallback = Expect<std::pair<ValVariant, ValType>>(
       const std::string &ModName, const std::string &Field);
   std::function<GetCallback> onGet;
 

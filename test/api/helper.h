@@ -23,7 +23,8 @@ WasmEdge_ConfigureContext *createConf(const Configure &Conf);
 
 ErrCode convResult(WasmEdge_Result Res);
 
-std::vector<ValVariant> convToValVec(const std::vector<WasmEdge_Value> &CVals);
+std::pair<std::vector<ValVariant>, std::vector<ValType>>
+convToValVec(const std::vector<WasmEdge_Value> &CVals);
 
 std::vector<WasmEdge_Value> convFromValVec(const std::vector<ValVariant> &Vals,
                                            const std::vector<ValType> &Types);

@@ -39,8 +39,10 @@ TEST(ExternRefTest, Ref__Functions) {
                   WasmEdge::ValType::I32};
   auto Res1 = VM.execute("call_add", FuncArgs, FuncArgTypes);
   ASSERT_TRUE(Res1);
-  EXPECT_EQ((*Res1).size(), 1U);
-  EXPECT_EQ((*Res1)[0].get<uint32_t>(), 6912U);
+  EXPECT_EQ((*Res1).first.size(), 1U);
+  EXPECT_EQ((*Res1).second.size(), 1U);
+  EXPECT_EQ((*Res1).first[0].get<uint32_t>(), 6912U);
+  EXPECT_EQ((*Res1).second[0], WasmEdge::ValType::I32);
 
   /// Test 2: call mul -- 789 * 4321
   FuncArgs = {WasmEdge::ExternRef(MulFunc), 789U, 4321U};
@@ -48,16 +50,20 @@ TEST(ExternRefTest, Ref__Functions) {
                   WasmEdge::ValType::I32};
   auto Res2 = VM.execute("call_mul", FuncArgs, FuncArgTypes);
   ASSERT_TRUE(Res2);
-  EXPECT_EQ((*Res1).size(), 1U);
-  EXPECT_EQ((*Res2)[0].get<uint32_t>(), 3409269U);
+  EXPECT_EQ((*Res2).first.size(), 1U);
+  EXPECT_EQ((*Res2).second.size(), 1U);
+  EXPECT_EQ((*Res2).first[0].get<uint32_t>(), 3409269U);
+  EXPECT_EQ((*Res2).second[0], WasmEdge::ValType::I32);
 
   /// Test 3: call square -- 8256^2
   FuncArgs = {WasmEdge::ExternRef(&SS), 8256U};
   FuncArgTypes = {WasmEdge::ValType::ExternRef, WasmEdge::ValType::I32};
   auto Res3 = VM.execute("call_square", FuncArgs, FuncArgTypes);
   ASSERT_TRUE(Res3);
-  EXPECT_EQ((*Res1).size(), 1U);
-  EXPECT_EQ((*Res3)[0].get<uint32_t>(), 68161536U);
+  EXPECT_EQ((*Res3).first.size(), 1U);
+  EXPECT_EQ((*Res3).second.size(), 1U);
+  EXPECT_EQ((*Res3).first[0].get<uint32_t>(), 68161536U);
+  EXPECT_EQ((*Res3).second[0], WasmEdge::ValType::I32);
 
   /// Test 4: call sum and square -- (210 + 654)^2
   FuncArgs = {WasmEdge::ExternRef(&AC), WasmEdge::ExternRef(&SS), 210U, 654U};
@@ -65,8 +71,10 @@ TEST(ExternRefTest, Ref__Functions) {
                   WasmEdge::ValType::I32, WasmEdge::ValType::I32};
   auto Res4 = VM.execute("call_add_square", FuncArgs, FuncArgTypes);
   ASSERT_TRUE(Res4);
-  EXPECT_EQ((*Res1).size(), 1U);
-  EXPECT_EQ((*Res4)[0].get<uint32_t>(), 746496U);
+  EXPECT_EQ((*Res4).first.size(), 1U);
+  EXPECT_EQ((*Res4).second.size(), 1U);
+  EXPECT_EQ((*Res4).first[0].get<uint32_t>(), 746496U);
+  EXPECT_EQ((*Res4).second[0], WasmEdge::ValType::I32);
 }
 
 TEST(ExternRefTest, Ref__STL) {
@@ -94,7 +102,7 @@ TEST(ExternRefTest, Ref__STL) {
   FuncArgTypes = {WasmEdge::ValType::ExternRef, WasmEdge::ValType::ExternRef};
   auto Res1 = VM.execute("call_ostream_str", FuncArgs, FuncArgTypes);
   ASSERT_TRUE(Res1);
-  EXPECT_EQ((*Res1).size(), 0U);
+  EXPECT_EQ((*Res1).first.size(), 0U);
   EXPECT_EQ(STLSS.str(), "hello world!");
 
   /// Test 2: call ostream << uint32_t
@@ -102,7 +110,7 @@ TEST(ExternRefTest, Ref__STL) {
   FuncArgTypes = {WasmEdge::ValType::ExternRef, WasmEdge::ValType::I32};
   auto Res2 = VM.execute("call_ostream_u32", FuncArgs, FuncArgTypes);
   ASSERT_TRUE(Res2);
-  EXPECT_EQ((*Res2).size(), 0U);
+  EXPECT_EQ((*Res2).first.size(), 0U);
   EXPECT_EQ(STLSS.str(), "hello world!123456");
 
   /// Test 3: call map insert {key, val}
@@ -114,7 +122,7 @@ TEST(ExternRefTest, Ref__STL) {
                   WasmEdge::ValType::ExternRef};
   auto Res3 = VM.execute("call_map_insert", FuncArgs, FuncArgTypes);
   ASSERT_TRUE(Res3);
-  EXPECT_EQ((*Res3).size(), 0U);
+  EXPECT_EQ((*Res3).first.size(), 0U);
   EXPECT_NE(STLMap.find(STLStrKey), STLMap.end());
   EXPECT_EQ(STLMap.find(STLStrKey)->second, STLStrVal);
 
@@ -124,7 +132,7 @@ TEST(ExternRefTest, Ref__STL) {
   FuncArgTypes = {WasmEdge::ValType::ExternRef, WasmEdge::ValType::ExternRef};
   auto Res4 = VM.execute("call_map_erase", FuncArgs, FuncArgTypes);
   ASSERT_TRUE(Res4);
-  EXPECT_EQ((*Res4).size(), 0U);
+  EXPECT_EQ((*Res4).first.size(), 0U);
   EXPECT_EQ(STLMap.find(STLStrKey), STLMap.end());
 
   /// Test 5: call set insert {key}
@@ -132,7 +140,7 @@ TEST(ExternRefTest, Ref__STL) {
   FuncArgTypes = {WasmEdge::ValType::ExternRef, WasmEdge::ValType::I32};
   auto Res5 = VM.execute("call_set_insert", FuncArgs, FuncArgTypes);
   ASSERT_TRUE(Res5);
-  EXPECT_EQ((*Res5).size(), 0U);
+  EXPECT_EQ((*Res5).first.size(), 0U);
   EXPECT_NE(STLSet.find(3456U), STLSet.end());
 
   /// Test 6: call set erase {key}
@@ -140,7 +148,7 @@ TEST(ExternRefTest, Ref__STL) {
   FuncArgTypes = {WasmEdge::ValType::ExternRef, WasmEdge::ValType::I32};
   auto Res6 = VM.execute("call_set_erase", FuncArgs, FuncArgTypes);
   ASSERT_TRUE(Res6);
-  EXPECT_EQ((*Res6).size(), 0U);
+  EXPECT_EQ((*Res6).first.size(), 0U);
   EXPECT_EQ(STLSet.find(3456U), STLSet.end());
 
   /// Test 7: call vector push {val}
@@ -149,7 +157,7 @@ TEST(ExternRefTest, Ref__STL) {
   FuncArgTypes = {WasmEdge::ValType::ExternRef, WasmEdge::ValType::I32};
   auto Res7 = VM.execute("call_vector_push", FuncArgs, FuncArgTypes);
   ASSERT_TRUE(Res7);
-  EXPECT_EQ((*Res7).size(), 0U);
+  EXPECT_EQ((*Res7).first.size(), 0U);
   EXPECT_EQ(STLVec.size(), 10U);
   EXPECT_EQ(STLVec[9], 100U);
 
@@ -160,8 +168,10 @@ TEST(ExternRefTest, Ref__STL) {
   FuncArgTypes = {WasmEdge::ValType::ExternRef, WasmEdge::ValType::ExternRef};
   auto Res8 = VM.execute("call_vector_sum", FuncArgs, FuncArgTypes);
   ASSERT_TRUE(Res8);
-  EXPECT_EQ((*Res8).size(), 1U);
-  EXPECT_EQ((*Res8)[0].get<uint32_t>(), 40U + 50U + 60U + 70U + 80U);
+  EXPECT_EQ((*Res8).first.size(), 1U);
+  EXPECT_EQ((*Res8).second.size(), 1U);
+  EXPECT_EQ((*Res8).first[0].get<uint32_t>(), 40U + 50U + 60U + 70U + 80U);
+  EXPECT_EQ((*Res8).second[0], WasmEdge::ValType::I32);
 }
 
 } // namespace

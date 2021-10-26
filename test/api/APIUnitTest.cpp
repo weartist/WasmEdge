@@ -1058,7 +1058,9 @@ TEST(APICoreTest, ExecutorWithStatistics) {
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_ExecutorInvoke(ExecCxt, Store, FuncName, P, 2, R, 2)));
   EXPECT_EQ(246, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   EXPECT_EQ(912, WasmEdge_ValueGetI32(R[1]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[1].Type);
   EXPECT_FALSE(WasmEdge_ResultOK(
       WasmEdge_ExecutorInvoke(nullptr, Store, FuncName, P, 2, R, 2)));
   EXPECT_FALSE(WasmEdge_ResultOK(
@@ -1085,6 +1087,7 @@ TEST(APICoreTest, ExecutorWithStatistics) {
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_ExecutorInvoke(ExecCxt, Store, FuncName, P, 2, R, 1)));
   EXPECT_EQ(246, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   /// Discard result
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_ExecutorInvoke(ExecCxt, Store, FuncName, P, 2, nullptr, 0)));
@@ -1117,6 +1120,7 @@ TEST(APICoreTest, ExecutorWithStatistics) {
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_ExecutorInvoke(ExecCxt, Store, FuncName, P, 1, R, 1)));
   EXPECT_EQ(1000, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   WasmEdge_StringDelete(FuncName);
   /// Call sub: (123) - (456)
   FuncName = WasmEdge_StringCreateByCString("func-host-sub");
@@ -1125,6 +1129,7 @@ TEST(APICoreTest, ExecutorWithStatistics) {
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_ExecutorInvoke(ExecCxt, Store, FuncName, P, 1, R, 1)));
   EXPECT_EQ(-333, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   WasmEdge_StringDelete(FuncName);
   /// Call mul: (-30) * (-66)
   FuncName = WasmEdge_StringCreateByCString("func-host-mul");
@@ -1133,6 +1138,7 @@ TEST(APICoreTest, ExecutorWithStatistics) {
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_ExecutorInvoke(ExecCxt, Store, FuncName, P, 1, R, 1)));
   EXPECT_EQ(1980, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   WasmEdge_StringDelete(FuncName);
   /// Call div: (-9999) / (1234)
   FuncName = WasmEdge_StringCreateByCString("func-host-div");
@@ -1141,6 +1147,7 @@ TEST(APICoreTest, ExecutorWithStatistics) {
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_ExecutorInvoke(ExecCxt, Store, FuncName, P, 1, R, 1)));
   EXPECT_EQ(-8, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   WasmEdge_StringDelete(FuncName);
 
   /// Invoke functions of registered module
@@ -1154,6 +1161,7 @@ TEST(APICoreTest, ExecutorWithStatistics) {
   EXPECT_TRUE(WasmEdge_ResultOK(WasmEdge_ExecutorInvokeRegistered(
       ExecCxt, Store, ModName, FuncName, P, 2, R, 1)));
   EXPECT_EQ(6500, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   EXPECT_FALSE(WasmEdge_ResultOK(WasmEdge_ExecutorInvokeRegistered(
       nullptr, Store, ModName, FuncName, P, 2, R, 1)));
   EXPECT_FALSE(WasmEdge_ResultOK(WasmEdge_ExecutorInvokeRegistered(
@@ -1216,6 +1224,7 @@ TEST(APICoreTest, ExecutorWithStatistics) {
   EXPECT_TRUE(WasmEdge_ResultOK(WasmEdge_ExecutorInvokeRegistered(
       ExecCxt, Store, ModName, FuncName, P, 2, R, 1)));
   EXPECT_EQ(-266, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   WasmEdge_StringDelete(FuncName);
   FuncName = WasmEdge_StringCreateByCString("func-term");
   Res = WasmEdge_ExecutorInvokeRegistered(ExecCxt, Store, ModName, FuncName,
@@ -2048,7 +2057,9 @@ TEST(APICoreTest, VM) {
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_VMRunWasmFromFile(VM, TPath, FuncName, P, 2, R, 2)));
   EXPECT_EQ(246, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   EXPECT_EQ(912, WasmEdge_ValueGetI32(R[1]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[1].Type);
   EXPECT_FALSE(WasmEdge_ResultOK(
       WasmEdge_VMRunWasmFromFile(nullptr, TPath, FuncName, P, 2, R, 2)));
   EXPECT_FALSE(WasmEdge_ResultOK(
@@ -2075,6 +2086,7 @@ TEST(APICoreTest, VM) {
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_VMRunWasmFromFile(VM, TPath, FuncName, P, 2, R, 1)));
   EXPECT_EQ(246, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   /// Discard result
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_VMRunWasmFromFile(VM, TPath, FuncName, P, 2, nullptr, 0)));
@@ -2089,7 +2101,9 @@ TEST(APICoreTest, VM) {
       VM, Buf.data(), static_cast<uint32_t>(Buf.size()), FuncName, P, 2, R,
       2)));
   EXPECT_EQ(246, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   EXPECT_EQ(912, WasmEdge_ValueGetI32(R[1]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[1].Type);
   EXPECT_FALSE(WasmEdge_ResultOK(WasmEdge_VMRunWasmFromBuffer(
       nullptr, Buf.data(), static_cast<uint32_t>(Buf.size()), FuncName, P, 2, R,
       2)));
@@ -2123,6 +2137,7 @@ TEST(APICoreTest, VM) {
       VM, Buf.data(), static_cast<uint32_t>(Buf.size()), FuncName, P, 2, R,
       1)));
   EXPECT_EQ(246, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   /// Discard result
   EXPECT_TRUE(WasmEdge_ResultOK(WasmEdge_VMRunWasmFromBuffer(
       VM, Buf.data(), static_cast<uint32_t>(Buf.size()), FuncName, P, 2,
@@ -2138,7 +2153,9 @@ TEST(APICoreTest, VM) {
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_VMRunWasmFromASTModule(VM, Mod, FuncName, P, 2, R, 2)));
   EXPECT_EQ(246, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   EXPECT_EQ(912, WasmEdge_ValueGetI32(R[1]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[1].Type);
   EXPECT_FALSE(WasmEdge_ResultOK(
       WasmEdge_VMRunWasmFromASTModule(nullptr, Mod, FuncName, P, 2, R, 2)));
   EXPECT_FALSE(WasmEdge_ResultOK(
@@ -2165,6 +2182,7 @@ TEST(APICoreTest, VM) {
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_VMRunWasmFromASTModule(VM, Mod, FuncName, P, 2, R, 1)));
   EXPECT_EQ(246, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   /// Discard result
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_VMRunWasmFromASTModule(VM, Mod, FuncName, P, 2, nullptr, 0)));
@@ -2226,7 +2244,9 @@ TEST(APICoreTest, VM) {
   EXPECT_TRUE(WasmEdge_ResultOK(WasmEdge_VMInstantiate(VM)));
   EXPECT_TRUE(WasmEdge_ResultOK(WasmEdge_VMExecute(VM, FuncName, P, 2, R, 2)));
   EXPECT_EQ(246, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   EXPECT_EQ(912, WasmEdge_ValueGetI32(R[1]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[1].Type);
   EXPECT_FALSE(
       WasmEdge_ResultOK(WasmEdge_VMExecute(nullptr, FuncName, P, 2, R, 2)));
   /// Function type mismatch
@@ -2248,6 +2268,7 @@ TEST(APICoreTest, VM) {
   R[0] = WasmEdge_ValueGenI32(0);
   EXPECT_TRUE(WasmEdge_ResultOK(WasmEdge_VMExecute(VM, FuncName, P, 2, R, 1)));
   EXPECT_EQ(246, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   /// Discard result
   EXPECT_TRUE(
       WasmEdge_ResultOK(WasmEdge_VMExecute(VM, FuncName, P, 2, nullptr, 0)));
@@ -2262,7 +2283,9 @@ TEST(APICoreTest, VM) {
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_VMExecuteRegistered(VM, ModName, FuncName, P, 2, R, 2)));
   EXPECT_EQ(246, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   EXPECT_EQ(912, WasmEdge_ValueGetI32(R[1]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[1].Type);
   EXPECT_FALSE(WasmEdge_ResultOK(
       WasmEdge_VMExecuteRegistered(nullptr, ModName, FuncName, P, 2, R, 2)));
   /// Function type mismatch
@@ -2290,6 +2313,7 @@ TEST(APICoreTest, VM) {
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_VMExecuteRegistered(VM, ModName, FuncName, P, 2, R, 1)));
   EXPECT_EQ(246, WasmEdge_ValueGetI32(R[0]));
+  EXPECT_EQ(WasmEdge_ValType_I32, R[0].Type);
   /// Discard result
   EXPECT_TRUE(WasmEdge_ResultOK(
       WasmEdge_VMExecuteRegistered(VM, ModName, FuncName, P, 2, nullptr, 0)));

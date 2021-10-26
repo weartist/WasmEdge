@@ -40,19 +40,24 @@ ErrCode convResult(WasmEdge_Result Res) {
   return static_cast<ErrCode>(Res.Code);
 }
 
-std::vector<ValVariant> convToValVec(const std::vector<WasmEdge_Value> &CVals) {
+std::pair<std::vector<ValVariant>, std::vector<ValType>>
+convToValVec(const std::vector<WasmEdge_Value> &CVals) {
   std::vector<ValVariant> Vals(CVals.size());
-  std::transform(
-      CVals.cbegin(), CVals.cend(), Vals.begin(),
-      [](const WasmEdge_Value &Val) {
+  std::vector<ValType> ValTypes(CVals.size());
+  std::transform(CVals.cbegin(), CVals.cend(), Vals.begin(),
+                 [](const WasmEdge_Value &Val) {
 #if defined(__x86_64__) || defined(__aarch64__)
-        return ValVariant(Val.Value);
+                   return ValVariant(Val.Value);
 #else
         return ValVariant(WasmEdge::uint128_t(Val.Value.High, Val.Value.Low));
 #endif
-      });
-  return Vals;
+                 });
+  std::transform(
+      CVals.cbegin(), CVals.cend(), ValTypes.begin(),
+      [](const WasmEdge_Value &Val) { return static_cast<ValType>(Val.Type); });
+  return std::make_pair(Vals, ValTypes);
 }
+
 std::vector<WasmEdge_Value> convFromValVec(const std::vector<ValVariant> &Vals,
                                            const std::vector<ValType> &Types) {
   std::vector<WasmEdge_Value> CVals(Vals.size());
@@ -61,9 +66,10 @@ std::vector<WasmEdge_Value> convFromValVec(const std::vector<ValVariant> &Vals,
     CVals[I] = WasmEdge_Value{.Value = Vals[I].get<WasmEdge::uint128_t>(),
                               .Type = static_cast<WasmEdge_ValType>(Types[I])};
 #else
-    WasmEdge::uint128_t Val= Vals[I].get<WasmEdge::uint128_t>();
-    CVals[I] = WasmEdge_Value{.Value = {.Low = Val.low(), .High = static_cast<uint64_t>(Val.high())},
-                              .Type = static_cast<WasmEdge_ValType>(Types[I])};
+    WasmEdge::uint128_t Val = Vals[I].get<WasmEdge::uint128_t>();
+    CVals[I] = WasmEdge_Value{
+        .Value = {.Low = Val.low(), .High = static_cast<uint64_t>(Val.high())},
+        .Type = static_cast<WasmEdge_ValType>(Types[I])};
 #endif
   }
   return CVals;
