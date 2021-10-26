@@ -334,6 +334,11 @@ bool SpecTest::compare(const std::pair<std::string, std::string> &Expected,
       for (size_t I = 0; I < 4; ++I) {
         if (Parts[I].substr(0, 4) == "nan:"sv) {
           if (!std::isnan(VF[I])) {
+            std::cout << "       inner >>>>> val: " << VI[0] << " " << VI[1]
+                      << " " << VI[2] << " " << VI[3] << std::endl;
+            std::cout << "       inner >>>>> parts: " << Parts[0] << " "
+                      << Parts[1] << " " << Parts[2] << " " << Parts[3]
+                      << std::endl;
             return false;
           }
         } else {
@@ -355,6 +360,10 @@ bool SpecTest::compare(const std::pair<std::string, std::string> &Expected,
       for (size_t I = 0; I < 2; ++I) {
         if (Parts[I].substr(0, 4) == "nan:"sv) {
           if (!std::isnan(VF[I])) {
+            std::cout << "       inner >>>>> val: " << VI[0] << " " << VI[1]
+                      << std::endl;
+            std::cout << "       inner >>>>> parts: " << Parts[0] << " "
+                      << Parts[1] << std::endl;
             return false;
           }
         } else {
@@ -545,6 +554,7 @@ void SpecTest::run(std::string_view Proposal, std::string_view UnitName) {
   /// Command processing. Return true for expected result.
   auto RunCommand = [&](const rapidjson::Value &Cmd) {
     /// Line number in wast: Cmd["line"].Get<uint32_t>()
+    std::cout << " ------- line " << Cmd["line"].Get<uint32_t>() << std::endl;
     if (const auto Type = Cmd.FindMember("type"s); Type != Cmd.MemberEnd()) {
       switch (resolveCommand(Type->value.Get<std::string>())) {
       case SpecTest::CommandID::Module: {
