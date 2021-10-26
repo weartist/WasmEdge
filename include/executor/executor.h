@@ -105,10 +105,9 @@ public:
                               const AST::Module &Mod, std::string_view Name);
 
   /// Invoke function by function address in Store manager.
-  Expect<std::vector<ValVariant>> invoke(Runtime::StoreManager &StoreMgr,
-                                         const uint32_t FuncAddr,
-                                         Span<const ValVariant> Params,
-                                         Span<const ValType> ParamTypes);
+  Expect<std::pair<std::vector<ValVariant>, std::vector<ValType>>>
+  invoke(Runtime::StoreManager &StoreMgr, const uint32_t FuncAddr,
+         Span<const ValVariant> Params, Span<const ValType> ParamTypes);
 
 private:
   /// Run Wasm bytecode expression for initialization.

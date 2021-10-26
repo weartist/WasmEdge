@@ -218,13 +218,14 @@ inline std::string_view genStrView(const WasmEdge_String S) noexcept {
 /// Helper functions for converting a ValVariant vector to a WasmEdge_Value
 /// array.
 inline constexpr void fillWasmEdge_ValueArr(Span<const ValVariant> Vec,
+                                            Span<const ValType> TVec,
                                             WasmEdge_Value *Val,
                                             const uint32_t Len) noexcept {
   if (Val == nullptr) {
     return;
   }
   for (uint32_t I = 0; I < Len && I < Vec.size(); I++) {
-    Val[I] = genWasmEdge_Value(Vec[I], WasmEdge_ValType_I32);
+    Val[I] = genWasmEdge_Value(Vec[I], static_cast<WasmEdge_ValType>(TVec[I]));
   }
 }
 
@@ -1416,7 +1417,8 @@ WASMEDGE_CAPI_EXPORT WasmEdge_Result WasmEdge_ExecutorInvoke(
   auto ParamPair = genParamPair(Params, ParamLen);
   auto FuncStr = genStrView(FuncName);
   return wrap(
-      [&]() -> WasmEdge::Expect<std::vector<WasmEdge::ValVariant>> {
+      [&]() -> WasmEdge::Expect<std::pair<std::vector<WasmEdge::ValVariant>,
+                                          std::vector<WasmEdge::ValType>>> {
         /// Get module instance.
         WasmEdge::Runtime::Instance::ModuleInstance *ModInst;
         if (auto Res = fromStoreCxt(StoreCxt)->getActiveModule()) {
@@ -1438,8 +1440,10 @@ WASMEDGE_CAPI_EXPORT WasmEdge_Result WasmEdge_ExecutorInvoke(
         return Cxt->Exec.invoke(*fromStoreCxt(StoreCxt), FuncIter->second,
                                 ParamPair.first, ParamPair.second);
       },
-      [&](auto &&Res) { fillWasmEdge_ValueArr(*Res, Returns, ReturnLen); }, Cxt,
-      StoreCxt);
+      [&](auto &&Res) {
+        fillWasmEdge_ValueArr((*Res).first, (*Res).second, Returns, ReturnLen);
+      },
+      Cxt, StoreCxt);
 }
 
 WASMEDGE_CAPI_EXPORT WasmEdge_Result WasmEdge_ExecutorInvokeRegistered(
@@ -1451,7 +1455,8 @@ WASMEDGE_CAPI_EXPORT WasmEdge_Result WasmEdge_ExecutorInvokeRegistered(
   auto ModStr = genStrView(ModuleName);
   auto FuncStr = genStrView(FuncName);
   return wrap(
-      [&]() -> WasmEdge::Expect<std::vector<WasmEdge::ValVariant>> {
+      [&]() -> WasmEdge::Expect<std::pair<std::vector<WasmEdge::ValVariant>,
+                                          std::vector<WasmEdge::ValType>>> {
         /// Get module instance.
         WasmEdge::Runtime::Instance::ModuleInstance *ModInst;
         if (auto Res = fromStoreCxt(StoreCxt)->findModule(ModStr)) {
@@ -1473,8 +1478,10 @@ WASMEDGE_CAPI_EXPORT WasmEdge_Result WasmEdge_ExecutorInvokeRegistered(
         return Cxt->Exec.invoke(*fromStoreCxt(StoreCxt), FuncIter->second,
                                 ParamPair.first, ParamPair.second);
       },
-      [&](auto &&Res) { fillWasmEdge_ValueArr(*Res, Returns, ReturnLen); }, Cxt,
-      StoreCxt);
+      [&](auto &&Res) {
+        fillWasmEdge_ValueArr((*Res).first, (*Res).second, Returns, ReturnLen);
+      },
+      Cxt, StoreCxt);
 }
 
 WASMEDGE_CAPI_EXPORT void
@@ -2293,7 +2300,10 @@ WASMEDGE_CAPI_EXPORT WasmEdge_Result WasmEdge_VMRunWasmFromFile(
                                    genStrView(FuncName), ParamPair.first,
                                    ParamPair.second);
       },
-      [&](auto Res) { fillWasmEdge_ValueArr(*Res, Returns, ReturnLen); }, Cxt);
+      [&](auto Res) {
+        fillWasmEdge_ValueArr((*Res).first, (*Res).second, Returns, ReturnLen);
+      },
+      Cxt);
 }
 
 WASMEDGE_CAPI_EXPORT WasmEdge_Result WasmEdge_VMRunWasmFromBuffer(
@@ -2307,7 +2317,9 @@ WASMEDGE_CAPI_EXPORT WasmEdge_Result WasmEdge_VMRunWasmFromBuffer(
         return Cxt->VM.runWasmFile(genSpan(Buf, BufLen), genStrView(FuncName),
                                    ParamPair.first, ParamPair.second);
       },
-      [&](auto &&Res) { fillWasmEdge_ValueArr(*Res, Returns, ReturnLen); },
+      [&](auto &&Res) {
+        fillWasmEdge_ValueArr((*Res).first, (*Res).second, Returns, ReturnLen);
+      },
       Cxt);
 }
 
@@ -2322,8 +2334,10 @@ WASMEDGE_CAPI_EXPORT WasmEdge_Result WasmEdge_VMRunWasmFromASTModule(
         return Cxt->VM.runWasmFile(*ASTCxt->Module.get(), genStrView(FuncName),
                                    ParamPair.first, ParamPair.second);
       },
-      [&](auto &&Res) { fillWasmEdge_ValueArr(*Res, Returns, ReturnLen); }, Cxt,
-      ASTCxt);
+      [&](auto &&Res) {
+        fillWasmEdge_ValueArr((*Res).first, (*Res).second, Returns, ReturnLen);
+      },
+      Cxt, ASTCxt);
 }
 
 WASMEDGE_CAPI_EXPORT WasmEdge_Result
@@ -2365,7 +2379,9 @@ WasmEdge_VMExecute(WasmEdge_VMContext *Cxt, const WasmEdge_String FuncName,
         return Cxt->VM.execute(genStrView(FuncName), ParamPair.first,
                                ParamPair.second);
       },
-      [&](auto &&Res) { fillWasmEdge_ValueArr(*Res, Returns, ReturnLen); },
+      [&](auto &&Res) {
+        fillWasmEdge_ValueArr((*Res).first, (*Res).second, Returns, ReturnLen);
+      },
       Cxt);
 }
 
@@ -2380,7 +2396,9 @@ WASMEDGE_CAPI_EXPORT WasmEdge_Result WasmEdge_VMExecuteRegistered(
         return Cxt->VM.execute(genStrView(ModuleName), genStrView(FuncName),
                                ParamPair.first, ParamPair.second);
       },
-      [&](auto &&Res) { fillWasmEdge_ValueArr(*Res, Returns, ReturnLen); },
+      [&](auto &&Res) {
+        fillWasmEdge_ValueArr((*Res).first, (*Res).second, Returns, ReturnLen);
+      },
       Cxt);
 }
 
